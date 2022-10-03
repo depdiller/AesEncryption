@@ -13,9 +13,3 @@ def key_gen(key_zero: bytearray) -> list[bytearray]:
     key_list.append(key_one)
     key_list.append(key_two)
     return key_list
-
-# test case
-key = bytearray.fromhex('2A53')
-generated = key_gen(key)
-for key in generated:
-    print(key.hex())
