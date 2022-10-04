@@ -1,5 +1,6 @@
+BLOCK_SIZE = 4
+
 class Aes:
-    block_size = 4 #bytes
     s_box = (
             0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
             0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
@@ -40,7 +41,7 @@ class Aes:
     @staticmethod
     def padding(data):
         new_block = data[:]
-        length_diff = 4 - len(data)
+        length_diff = BLOCK_SIZE - len(data)
         if (length_diff != 0):
             for _ in range(length_diff):
                 data.append(0)
@@ -48,10 +49,23 @@ class Aes:
 
     @staticmethod
     def encrypt_block(data, key):
-        length_diff = 4 - len(data)
+        length_diff = BLOCK_SIZE - len(data)
         if (length_diff < 0): raise Exception('Data block must be <= 32 bits')
         if (length_diff > 0):
             data = padding(data)
         data = permutation(data)
-        encrypted_block = bytes(a ^ b for a, b in zip(data, key))
+        encrypted_block = bytearray(bytes(a ^ b for a, b in zip(data, key)))
         return encrypted_block
+
+def partitioning(data: str):
+    data_bytes = bytearray.fromhex(data)
+    length = len (data_bytes)
+    number_of_blocks = length // BLOCK_SIZE
+    # 11 / 4 = 2 и блок = 3
+    # 01 d3 a2 32 ab 3e 1a 3a 6b 92 12 01 22 ->
+    # 01 d3 a2 32    ab 3e 1a 3a    6b 92 12 01   22
+    for i in range(0, length, BLOCK_SIZE):
+        block = data_bytes[i:i + BLOCK_SIZE]
+        print(block.hex())
+
+# partitioning('01 d3 a2 32 ab 3e 1a 3a 6b 92 12 01 22')
