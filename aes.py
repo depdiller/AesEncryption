@@ -49,21 +49,8 @@ def encrypt_block(data, key):
     if (length_diff > 0):
         data = padding(data)
     data = permutation(data)
-    encrypted_block = bytearray(bytes(a ^ b for a, b in zip(data, key)))
+    encrypted_block = xor(data, key)
     return encrypted_block
-
-def partitioning(data: str):
-    data_bytes = bytearray.fromhex(data)
-    length = len(data_bytes)
-    number_of_blocks = length // BLOCK_SIZE
-    # 11 / 4 = 2 и блок = 3
-    # 01 d3 a2 32 ab 3e 1a 3a 6b 92 12 01 22 ->
-    # 01 d3 a2 32    ab 3e 1a 3a    6b 92 12 01   22
-    list_of_blocks = []
-    for i in range(0, length, BLOCK_SIZE):
-        block = data_bytes[i:i + BLOCK_SIZE]
-        list_of_blocks.append(block)
-    return list_of_blocks
 
 blocks = partitioning('00 d3 a2 42 ab 3e 1a 3a 6b 92 12 01 22')
 key = bytearray.fromhex('01 9f a2 32')
