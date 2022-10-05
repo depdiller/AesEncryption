@@ -20,22 +20,34 @@ def ecb_encryption(data: str, key: str):
     blocks = partitioning(data)
     encrypted_text = bytearray()
     for block in blocks:
-        # 0 round
-        zero_round_res = xor(block, keys[0])
-        # 1 round
-        first_round_res = bytearray()
-        for block in zero_round_res:
-            encrypted_block = aes.encrypt_block(block, keys[1])
-            first_round_res.extend(encrypted_block)
-        # 2 round
-        second_round_res = bytearray()
-        for block in first_round_res:
-            encrypted_block = aes.encrypt_block(block, keys[2])
-            second_round_res.extend(encrypted_block)
-        encrypted_text.extend(second_round_res)
+        encrypted_block = aes.all_rounds_encryption(block, keys)
+        encrypted_text.extend(encrypted_block)
     return encrypted_text
 
-data = '02 5d 1a 3e 5f ff 1a 3b c3'
+def cbc_encryption(data: str, key: str, iv: str):
+    key = bytearray.fromhex(key)
+    iv = bytearray.fromhex(iv)
+    if (len(key) != aes.BLOCK_SIZE):
+        raise Exception('Key must be 32 bits')
+    if (len(iv) != aes.BLOCK_SIZE):
+        raise Exception('Initialization vector must be 32 bits')
+    keys = key_gen(key)
+    blocks = partitioning(data)
+    encrypted_text = bytearray()
+    xor_with = iv
+    for block in blocks:
+        xored_block = xor(xor_with, block)
+        encrypted_block = aes.all_rounds_encryption(xored_block, keys)
+        xor_with = encrypted_block
+        encrypted_text.extend(encrypted_block)
+    return encrypted_text
+    
+    
+data = '02 5d 2a 1e 5f ff 1a 3b c3'
 key = '12 34 6d 3b'
-encrypted = ecb_encryption(data, key)
-print(encrypted.hex())
+iv = '42 5b 3a 1f'
+ecb_encrypted = ecb_encryption(data, key)
+cbc_encrypted = cbc_encryption(data, key, iv)
+
+print(ecb_encrypted.hex())
+print(cbc_encrypted.hex())

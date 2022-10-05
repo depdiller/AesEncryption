@@ -25,7 +25,7 @@ def substitution(data):
     new_block = bytearray()
     for byte in data:
         as_int = int.from_bytes(byte)
-        i = as_int / 16
+        i = as_int // 16
         j = as_int % 16
         new_block.append(s_box[i][j])
     return new_block
@@ -53,3 +53,12 @@ def encrypt_block(data, key):
     data = permutation(data)
     encrypted_block = xor(data, key)
     return encrypted_block
+
+def all_rounds_encryption(block, key_list):
+   # 0 round
+    zero_round_res = xor(block, key_list[0])
+    # 1 round
+    first_round_res = encrypt_block(zero_round_res, key_list[1])
+    # 2 round
+    second_round_res = encrypt_block(first_round_res, key_list[2])
+    return second_round_res
