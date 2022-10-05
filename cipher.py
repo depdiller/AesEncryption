@@ -44,7 +44,7 @@ def cbc_encryption(data: str, key: str, iv: str):
     
     
 data = '02 5d 2a 1e 5f ff 1a 3b c3'
-key = '12 34 6d 3b'
+key = '11 34 6d 3b'
 iv = '42 5b 3a 1f'
 ecb_encrypted = ecb_encryption(data, key)
 cbc_encrypted = cbc_encryption(data, key, iv)
