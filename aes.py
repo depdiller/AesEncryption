@@ -1,3 +1,5 @@
+from binary_functions import xor
+
 BLOCK_SIZE = 4
 
 s_box = (
@@ -51,11 +53,3 @@ def encrypt_block(data, key):
     data = permutation(data)
     encrypted_block = xor(data, key)
     return encrypted_block
-
-blocks = partitioning('00 d3 a2 42 ab 3e 1a 3a 6b 92 12 01 22')
-key = bytearray.fromhex('01 9f a2 32')
-cipher = bytearray()
-for block in blocks:
-    encrypted_block = encrypt_block(block, key)
-    cipher.extend(encrypted_block)
-print(cipher.hex())

@@ -1,4 +1,4 @@
-import binary_functions
+from binary_functions import invert, xor
 
 def key_gen(key_zero: bytearray) -> list[bytearray]:
     key_list = []
