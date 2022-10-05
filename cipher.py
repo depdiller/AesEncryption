@@ -22,7 +22,37 @@ def ecb_encryption(data: str, key: str):
     for block in blocks:
         encrypted_block = aes.all_rounds_encryption(block, keys)
         encrypted_text.extend(encrypted_block)
-    return encrypted_text
+    return encrypted_text.hex()
+
+def ecb_decryption(data: str, key: str):
+    key = bytearray.fromhex(key)
+    if (len(key) != aes.BLOCK_SIZE):
+        raise Exception('Key must be 32 bits')
+    keys = key_gen(key)
+    blocks = partitioning(data)
+    decrypted_text = bytearray()
+    for block in blocks:
+        decrypted_block = aes.all_rounds_decryption(block, keys)
+        decrypted_text.extend(decrypted_block)
+    return decrypted_text.hex()
+
+def cbc_decryption(data: str, key: str, iv: str):
+    key = bytearray.fromhex(key)
+    iv = bytearray.fromhex(iv)
+    if (len(key) != aes.BLOCK_SIZE):
+        raise Exception('Key must be 32 bits')
+    if (len(iv) != aes.BLOCK_SIZE):
+        raise Exception('Initialization vector must be 32 bits')
+    keys = key_gen(key)
+    blocks = partitioning(data)
+    decrypted_text = bytearray()
+    xor_with = iv
+    for block in blocks:
+        decrypted_block = aes.all_rounds_decryption(block, keys)
+        xored_block = xor(xor_with, decrypted_block)
+        xor_with = block
+        decrypted_text.extend(xored_block)
+    return decrypted_text.hex()
 
 def cbc_encryption(data: str, key: str, iv: str):
     key = bytearray.fromhex(key)
@@ -40,14 +70,23 @@ def cbc_encryption(data: str, key: str, iv: str):
         encrypted_block = aes.all_rounds_encryption(xored_block, keys)
         xor_with = encrypted_block
         encrypted_text.extend(encrypted_block)
-    return encrypted_text
+    return encrypted_text.hex()
     
     
-data = '02 5d 2a 1e 5f ff 1a 3b c3'
-key = '11 34 6d 3b'
-iv = '42 5b 3a 1f'
+data = '025d2a1e5fff1a3bc3'
+key = '11346d3b'
+iv = '425b3a1f'
 ecb_encrypted = ecb_encryption(data, key)
 cbc_encrypted = cbc_encryption(data, key, iv)
 
-print(ecb_encrypted.hex())
-print(cbc_encrypted.hex())
+ecb_decrypted = ecb_decryption(ecb_encrypted, key)
+cbc_decrypted = cbc_decryption(cbc_encrypted, key, iv)
+print(ecb_encrypted + ' ' + ecb_decrypted)
+print(cbc_encrypted + ' ' + cbc_decrypted)
+
+assert (
+    ecb_decrypted == data
+)
+assert (
+    cbc_decrypted == data
+)

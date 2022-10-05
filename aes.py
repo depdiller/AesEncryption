@@ -1,4 +1,5 @@
 from binary_functions import xor
+from key_generation import key_gen
 
 BLOCK_SIZE = 4
 
@@ -117,3 +118,16 @@ def all_rounds_encryption(block, key_list):
     first_round_res = encrypt_block(zero_round_res, key_list[1])
     second_round_res = encrypt_block(first_round_res, key_list[2])
     return second_round_res
+
+def all_rounds_decryption(block, key_list):
+    second_round_res = decrypt_block(block, key_list[2])
+    first_round_res = decrypt_block(second_round_res, key_list[1])
+    zero_round_res = xor(first_round_res, key_list[0])
+    return zero_round_res
+
+keys = key_gen(key)
+enc = all_rounds_encryption(data, keys)
+dec = all_rounds_decryption(enc, keys)
+assert (
+    dec == data
+)
