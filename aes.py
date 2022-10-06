@@ -85,12 +85,27 @@ def padding(data):
             new_block.append(0)
     return new_block
 
+def delete_padding(data):
+    count = len(data) - 1
+    while (data[count] == 0): 
+        count -= 1
+    data = data[:count + 1]
+    return data
+
+block = bytearray.fromhex('ab')
+pad = padding(block)
+assert (
+    pad.hex() == 'ab000000'
+)
+del_pad = delete_padding(pad)
+assert (
+    del_pad.hex() == 'ab'
+)
+
 def encrypt_block(data, key):
     length_diff = BLOCK_SIZE - len(data)
-    if (length_diff < 0):
-        raise Exception('Data block must be <= 32 bits')
-    if (length_diff > 0):
-        data = padding(data)
+    if (length_diff != 0):
+        raise Exception('Data block must be = 32 bits')
     data = substitution(data)
     data = permutation(data)
     encrypted_block = xor(data, key)
